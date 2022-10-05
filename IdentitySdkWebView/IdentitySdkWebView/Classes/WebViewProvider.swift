@@ -9,7 +9,15 @@ public class WebViewProvider: ProviderCreator {
     
     public var name: String = NAME
     
-    public init() {}
+    // Set a Boolean value that indicates whether the session should ask the browser for a private authentication session when using webview provider login method
+    // Here is the apple documentation : https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio
+    let prefersEphemeralWebBrowserSession: Bool
+    
+    public init(
+        prefersEphemeralWebBrowserSession: Bool = false
+    ) {
+        self.prefersEphemeralWebBrowserSession = prefersEphemeralWebBrowserSession
+    }
     
     public func create(
         sdkConfig: SdkConfig,
@@ -21,7 +29,8 @@ public class WebViewProvider: ProviderCreator {
             sdkConfig: sdkConfig,
             providerConfig: providerConfig,
             reachFiveApi: reachFiveApi,
-            clientConfigResponse: clientConfigResponse
+            clientConfigResponse: clientConfigResponse,
+            prefersEphemeralWebBrowserSession: self.prefersEphemeralWebBrowserSession
         )
     }
 }
@@ -33,18 +42,21 @@ class ConfiguredWebViewProvider: NSObject, Provider {
     let providerConfig: ProviderConfig
     let reachFiveApi: ReachFiveApi
     let clientConfigResponse: ClientConfigResponse
+    let prefersEphemeralWebBrowserSession: Bool
     
     public init(
         sdkConfig: SdkConfig,
         providerConfig: ProviderConfig,
         reachFiveApi: ReachFiveApi,
-        clientConfigResponse: ClientConfigResponse
+        clientConfigResponse: ClientConfigResponse,
+        prefersEphemeralWebBrowserSession: Bool
     ) {
         self.sdkConfig = sdkConfig
         self.providerConfig = providerConfig
         self.reachFiveApi = reachFiveApi
         self.name = providerConfig.provider
         self.clientConfigResponse = clientConfigResponse
+        self.prefersEphemeralWebBrowserSession = prefersEphemeralWebBrowserSession
     }
     
     public func login(
@@ -100,6 +112,8 @@ class ConfiguredWebViewProvider: NSObject, Provider {
             
             promise.completeWith(self.handleAuthCode(code: code, pkce: pkce))
         }
+        
+        session.prefersEphemeralWebBrowserSession = self.prefersEphemeralWebBrowserSession
         
         // Set an appropriate context provider instance that determines the window that acts as a presentation anchor for the session
         session.presentationContextProvider = (viewController as! ASWebAuthenticationPresentationContextProviding)
