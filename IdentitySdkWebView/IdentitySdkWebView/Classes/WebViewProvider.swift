@@ -33,6 +33,7 @@ class ConfiguredWebViewProvider: NSObject, Provider {
     let providerConfig: ProviderConfig
     let reachFiveApi: ReachFiveApi
     let clientConfigResponse: ClientConfigResponse
+    var session: ASWebAuthenticationSession?
     
     public init(
         sdkConfig: SdkConfig,
@@ -72,7 +73,7 @@ class ConfiguredWebViewProvider: NSObject, Provider {
             return promise.future
         }
         
-        let session = ASWebAuthenticationSession(url: authURL, callbackURLScheme: sdkConfig.baseScheme) { callbackURL, error in
+        session = ASWebAuthenticationSession(url: authURL, callbackURLScheme: sdkConfig.baseScheme) { callbackURL, error in
             guard error == nil else {
                 let r5Error: ReachFiveError
                 switch error!._code {
@@ -102,12 +103,13 @@ class ConfiguredWebViewProvider: NSObject, Provider {
         }
         
         // Set an appropriate context provider instance that determines the window that acts as a presentation anchor for the session
-        session.presentationContextProvider = viewController as? ASWebAuthenticationPresentationContextProviding
+        session?.presentationContextProvider = viewController as? ASWebAuthenticationPresentationContextProviding
     
         // Start the Authentication Flow
-        if !session.start() {
+        if !(session?.start() ?? false) {
             promise.failure(.TechnicalError(reason: "Failed to start ASWebAuthenticationSession"))
         }
+        
         return promise.future
     }
     
