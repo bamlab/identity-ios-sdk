@@ -99,7 +99,7 @@ class ConfiguredWebViewProvider: NSObject, Provider {
                 return
             }
             
-            promise.completeWith(self.handleAuthCode(code: code, pkce: pkce))
+            promise.completeWith(self.handleAuthCode(code: code, pkce: pkce, origin: origin))
         }
         
         // Set an appropriate context provider instance that determines the window that acts as a presentation anchor for the session
@@ -113,12 +113,13 @@ class ConfiguredWebViewProvider: NSObject, Provider {
         return promise.future
     }
     
-    private func handleAuthCode(code: String, pkce: Pkce) -> Future<AuthToken, ReachFiveError> {
+    private func handleAuthCode(code: String, pkce: Pkce, origin: String) -> Future<AuthToken, ReachFiveError> {
         let authCodeRequest = AuthCodeRequest(
             clientId: sdkConfig.clientId,
             code: code,
             redirectUri: sdkConfig.scheme,
-            pkce: pkce
+            pkce: pkce,
+            origin: origin
         )
         return reachFiveApi.authWithCode(authCodeRequest: authCodeRequest)
             .flatMap({ AuthToken.fromOpenIdTokenResponseFuture($0) })
