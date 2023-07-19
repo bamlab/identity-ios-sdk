@@ -65,7 +65,8 @@ class ConfiguredWebViewProvider: NSObject, Provider {
             sdkConfig: sdkConfig,
             providerConfig: providerConfig,
             scope: scope != nil ? scope!.joined(separator: " ") : clientConfigResponse.scope,
-            pkce: pkce
+            pkce: pkce,
+            origin: origin
         )
         
         guard let authURL = URL(string: url) else {
@@ -143,7 +144,7 @@ class ConfiguredWebViewProvider: NSObject, Provider {
         Future(value: ())
     }
     
-    func buildUrl(sdkConfig: SdkConfig, providerConfig: ProviderConfig, scope: String, pkce: Pkce) -> String {
+    func buildUrl(sdkConfig: SdkConfig, providerConfig: ProviderConfig, scope: String, pkce: Pkce, origin: String) -> String {
         let params = [
             "provider": providerConfig.provider,
             "client_id": sdkConfig.clientId,
@@ -153,6 +154,7 @@ class ConfiguredWebViewProvider: NSObject, Provider {
             "platform": "ios",
             "code_challenge": pkce.codeChallenge,
             "code_challenge_method": pkce.codeChallengeMethod,
+            "Origin": origin,
         ]
         let queryStrings = params
             .map { "\($0)=\($1)" }
