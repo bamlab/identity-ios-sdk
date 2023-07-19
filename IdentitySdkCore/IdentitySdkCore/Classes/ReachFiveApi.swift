@@ -85,8 +85,9 @@ public class ReachFiveApi {
     public func loginWithProvider(
         loginProviderRequest: LoginProviderRequest
     ) -> Future<AccessTokenResponse, ReachFiveError> {
-        AF
-            .request(createUrl(path: "/identity/v1/oauth/provider/token?platform=ios&sdk=\(sdk)&device=\(deviceInfo)"), method: .post, parameters: loginProviderRequest.dictionary(), encoding: JSONEncoding.default)
+        let origin: String = loginProviderRequest.origin ?? ""
+        return AF
+            .request(createUrl(path: "/identity/v1/oauth/provider/token?platform=ios?origin=\(origin)&sdk=\(sdk)&device=\(deviceInfo)"), method: .post, parameters: loginProviderRequest.dictionary(), encoding: JSONEncoding.default)
             .validate(statusCode: 200..<300)
             .validate(contentType: ["application/json"])
             .responseJson(type: AccessTokenResponse.self, decoder: decoder)
