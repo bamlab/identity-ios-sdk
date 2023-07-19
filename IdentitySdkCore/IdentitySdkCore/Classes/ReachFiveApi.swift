@@ -145,9 +145,10 @@ public class ReachFiveApi {
     }
     
     public func authWithCode(authCodeRequest: AuthCodeRequest) -> Future<AccessTokenResponse, ReachFiveError> {
-        AF
+        let origin: String = authCodeRequest.origin ?? ""
+        return AF
             .request(
-                createUrl(path: "/oauth/token?platform=ios&sdk=\(sdk)&device=\(deviceInfo)"),
+                createUrl(path: "/oauth/token?platform=ios&origin=\(origin)&sdk=\(sdk)&device=\(deviceInfo)"),
                 method: .post,
                 parameters: authCodeRequest.dictionary(),
                 encoding: JSONEncoding.default
