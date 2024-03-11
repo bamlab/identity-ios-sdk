@@ -1,4 +1,5 @@
 import Foundation
+import AuthenticationServices
 
 enum State {
     case NotInitialized
@@ -27,6 +28,7 @@ public class ReachFive: NSObject {
     public let storage: Storage
     let credentialManager: CredentialManager
     public let pkceKey = "PASSWORDLESS_PKCE"
+    var session: ASWebAuthenticationSession?
     
     public init(sdkConfig: SdkConfig, providersCreators: Array<ProviderCreator> = [], storage: Storage? = nil) {
         self.sdkConfig = sdkConfig

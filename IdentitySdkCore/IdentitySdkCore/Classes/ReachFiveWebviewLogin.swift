@@ -3,7 +3,6 @@ import BrightFutures
 import AuthenticationServices
 
 public extension ReachFive {
-    
     func webviewLogin(_ request: WebviewLoginRequest) -> Future<AuthToken, ReachFiveError> {
         
         let promise = Promise<AuthToken, ReachFiveError>()
@@ -12,7 +11,7 @@ public extension ReachFive {
         let authURL = buildAuthorizeURL(pkce: pkce, state: request.state, nonce: request.nonce, scope: scope, origin: request.origin, provider: request.provider)
         
         // Initialize the session.
-        let session = ASWebAuthenticationSession(url: authURL, callbackURLScheme: reachFiveApi.sdkConfig.baseScheme) { callbackURL, error in
+        session = ASWebAuthenticationSession(url: authURL, callbackURLScheme: reachFiveApi.sdkConfig.baseScheme) { callbackURL, error in
             if let error {
                 let r5Error: ReachFiveError
                 switch error._code {
@@ -41,10 +40,10 @@ public extension ReachFive {
         }
         
         // Set an appropriate context provider instance that determines the window that acts as a presentation anchor for the session
-        session.presentationContextProvider = request.presentationContextProvider
+        session?.presentationContextProvider = request.presentationContextProvider
         
         // Start the Authentication Flow
-        if !session.start() {
+        if !(session?.start() ?? false) {
             promise.failure(.TechnicalError(reason: "Failed to start ASWebAuthenticationSession"))
         }
         return promise.future
